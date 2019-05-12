@@ -36,4 +36,9 @@ public class DemoService {
 		return emailDet.toString();
     }
 
+    public boolean hasAttachment(String body) {
+		JSONObject emailDet = new JSONObject(body);
+		return emailDet.getBoolean("hasAttachment");
+	}
+
 }

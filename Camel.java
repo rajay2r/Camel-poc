@@ -1,10 +1,7 @@
 package rbs.cpb.usp.camel;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
-import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,22 +31,20 @@ public class Camel extends RouteBuilder {
         // "timer://myTimer?period=2000"
         // "timer://runOnce?repeatCount=1&delay=5000"
 
-		from("timer://runOnce?repeatCount=3").to("class:rbs.cpb.usp.camel.DemoService?method=emailService")
+		/*from("timer://runOnce?repeatCount=3").to("class:rbs.cpb.usp.camel.DemoService?method=initiateEmailNotificationProcess")
 				.choice()
 				.when(body().isEqualTo("indubalas@gmail.com")).process(eprocessor)
 				.to("class:rbs.cpb.usp.camel.DemoService?method=requestHandlerFirst(${body})")
 				.when(body().isEqualTo("rajam@gmail.com")).process(eprocessor)
 				.to("class:rbs.cpb.usp.camel.DemoService?method=requestHandlerSecond(${body})")
 				.otherwise()
-				.log("Please check your MailId is valid");
+				.log("Please check your MailId is valid");*/
 
-        /*from("timer://runOnce?repeatCount=3").to("class:rbs.cpb.usp.camel.DemoService?method=emailService").transform(${body})
-	choice()
-                .when(body().convertTo(String.class). isEqualTo("indubalas@gmail.com")).process(eprocessor)
-                .to("class:rbs.cpb.usp.camel.DemoService?method=requestHandlerFirst(${body})")
-                .when(body().isEqualTo("rajam@gmail.com")).process(eprocessor)
-                .to("class:rbs.cpb.usp.camel.DemoService?method=requestHandlerSecond(${body})")
-                .otherwise().log("Please check your MailId is valid");*/
-
+        from("timer://runOnce?repeatCount=1")
+		  .to("class:rbs.cpb.usp.camel.DemoService?method=initiateEmailNotificationProcess")
+			.choice()
+			.when(method(DemoService.class, "hasAttachment(${body})")).process(eprocessor)
+			.otherwise()
+			.log("No attachments");
 	}
 }
